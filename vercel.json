@@ -1,11 +1,11 @@
 {
-    "functions": {
-      "api/index.js": {
-        "runtime": "nodejs22.x"
+    "version": 2,
+    "builds": {},
+    "routes": [
+      {
+        "src": "/(.*)",
+        "dest": "/api/index.js"
       }
-    },
-    "rewrites": [
-      { "source": "/(.*)", "destination": "/" }
     ]
   }
   
