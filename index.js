@@ -13,23 +13,21 @@ require('dotenv').config();
 const storage = multer.memoryStorage();
 const upload = multer({ storage: storage });
 
-// Ambil path dari environment variable dan resolve ke path absolut
-const googleCloudKeyPath = process.env.GOOGLE_CLOUD_SERVICE_ACCOUNT_KEY;
-
-let googleCloudKey;
-try {
-  if (!googleCloudKeyPath) {
-    throw new Error("Path ke file kunci Google Cloud tidak ditemukan. Periksa file .env Anda.");
-  }
-  googleCloudKey = JSON.parse(fs.readFileSync(path.resolve(__dirname, googleCloudKeyPath), 'utf8'));
-} catch (error) {
-  console.error("Error membaca kunci layanan Google Cloud:", error.message);
-  process.exit(1); // Hentikan proses jika kunci layanan tidak valid
-}
+const serviceAccount = {
+  type: "service_account",
+  project_id: process.env.FIREBASE_PROJECT_ID,
+  private_key: process.env.FIREBASE_PRIVATE_KEY.replace(/\\n/g, '\n'), // Perhatikan penggantian karakter \n
+  client_email: process.env.FIREBASE_CLIENT_EMAIL,
+  client_id: process.env.FIREBASE_CLIENT_ID,
+  auth_uri: "https://accounts.google.com/o/oauth2/auth",
+  token_uri: "https://oauth2.googleapis.com/token",
+  auth_provider_x509_cert_url: "https://www.googleapis.com/oauth2/v1/certs",
+  client_x509_cert_url: `https://www.googleapis.com/robot/v1/metadata/x509/${process.env.FIREBASE_CLIENT_EMAIL}`
+};
 
 // Inisialisasi Firebase Admin SDK
 admin.initializeApp({
-  credential: admin.credential.cert(googleCloudKey),
+  credential: admin.credential.cert(serviceAccount),
   databaseURL: "https://fbuses-3e232-default-rtdb.firebaseio.com/", // Sesuaikan dengan databaseURL Anda
 });
 
